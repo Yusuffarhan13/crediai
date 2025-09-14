@@ -362,55 +362,368 @@ export const dataManager = {
   getDashboardData: () => calculateDashboardData()
 };
 
-// Chat responses (simulate AI responses)
+// Enhanced AI Chat Response System
 export const getChatResponse = (message) => {
-  const responses = [
-    "Great question about saving! Try the 50/30/20 rule - it's perfect for beginners! 💰",
-    "Smart thinking! Investing early is key. Start with index funds or ETFs for safety 📈",
-    "Pro tip: Track every expense for a week. You'll be surprised where your money goes! 📝",
-    "Emergency funds are crucial! Aim for 3-6 months of expenses saved up 🛡️",
-    "Compound interest is your best friend! Even small amounts grow big over time 🚀",
-    "Consider a high-yield savings account for better returns on your emergency fund 🏦",
-    "Budgeting apps can help! But our built-in tracker works great too 📱",
-    "Remember: It's not about how much you earn, but how much you keep! 💡"
-  ];
+  const lowerMessage = message.toLowerCase();
   
-  return responses[Math.floor(Math.random() * responses.length)];
+  // Comprehensive response database with context-aware replies
+  const responseCategories = {
+    // Budgeting responses
+    budget: [
+      "Let me help you with budgeting! 💰 The 50/30/20 rule works great: 50% for needs (rent, food, utilities), 30% for wants (entertainment, shopping), and 20% for savings. Based on your income, that would be approximately LKR 25,000 for needs, LKR 15,000 for wants, and LKR 10,000 for savings.",
+      "Creating a budget? Start by tracking all expenses for 2 weeks. I noticed you spend about LKR 8,000 monthly on food - you could save LKR 3,000 by meal prepping! Use our transaction tracker to categorize everything. 📊",
+      "Your budget analysis: You're spending 35% on food, 20% on transport, and 15% on entertainment. Consider reducing food expenses by cooking more at home. Sri Lankan home cooking costs about LKR 200 per meal vs LKR 800 at restaurants! 🍛"
+    ],
+    
+    // Saving strategies
+    saving: [
+      "Here's your personalized savings plan! 💸 Start with LKR 5,000 monthly (just LKR 167 per day - skip one coffee!). Open a high-yield savings account at Commercial Bank (4.5% interest) or NSB (5% for youth accounts). In one year, you'll have LKR 60,000 plus interest!",
+      "Automatic savings work best! Set up a standing order to transfer LKR 10,000 to savings right after your salary hits. Treat it like a bill you MUST pay. Also, every time you get a bonus or gift money, save 50% immediately! 🎯",
+      "The 52-week challenge adapted for Sri Lanka: Week 1 save LKR 100, Week 2 save LKR 200, and so on. By week 52, you'll save LKR 5,200 that week, totaling LKR 137,800 for the year! Too aggressive? Do it monthly instead! 📈"
+    ],
+    
+    // Investment advice
+    invest: [
+      "Ready to invest? 📈 Start with the Colombo Stock Exchange (CSE). Open a CDS account through your bank. Begin with blue-chip stocks like John Keells, Dialog, or Commercial Bank. Start with just LKR 10,000 and learn as you go!",
+      "Investment options in Sri Lanka: 1) Fixed Deposits (8-10% returns), 2) Treasury Bills (10-12% but need LKR 100,000 minimum), 3) Unit Trusts (managed funds starting from LKR 5,000), 4) Stock Market (higher risk, higher reward). Diversify across these! 💼",
+      "For beginners: Start with a balanced unit trust from companies like Capital Alliance or Guardian. They manage your money professionally, and you can start with as little as LKR 5,000. Returns average 12-15% annually. Much better than keeping money in savings! 🚀"
+    ],
+    
+    // Debt management
+    debt: [
+      "Let's tackle your debt strategically! 🎯 List all debts from highest to lowest interest rate. Pay minimums on all, then attack the highest rate first (avalanche method). If you have a 24% credit card debt, pay that before your 14% personal loan!",
+      "Debt consolidation might help! If you have multiple high-interest debts, consider a personal loan at 14-16% to pay them all off. One payment, lower interest. Banks like Sampath and HNB offer good consolidation loans. Calculate if you'll save on interest! 💳",
+      "Quick debt tips: 1) Stop using credit cards temporarily, 2) Negotiate lower rates with your bank (they often agree!), 3) Make bi-weekly payments instead of monthly to reduce interest, 4) Use any bonus money for debt, not spending! 🛡️"
+    ],
+    
+    // Sri Lankan specific financial advice
+    srilanka: [
+      "Sri Lankan money tips! 🇱🇰 1) Use Koko app for cashback on bills, 2) Pay utilities through Genie for rewards, 3) Commercial Bank's Flash accounts have no minimum balance, 4) FriMi from Nations Trust is great for instant transfers!",
+      "Local savings hacks: Buy wholesale from Pettah for 40% savings, use PickMe over regular taxis (30% cheaper), get a Dialog/Mobitel postpaid plan with data bundles, shop at Arpico/Keells during their weekly sales (Wednesdays usually)! 🛒",
+      "EPF/ETF tips: Your employer contributes 12% EPF + 3% ETF. You contribute 8% EPF. That's 23% forced savings! Additionally, save 10% yourself. Also, check if you qualify for Samurdhi benefits or other government programs! 📋"
+    ],
+    
+    // Goal setting
+    goals: [
+      "Let's set SMART financial goals! 🎯 Your Gaming PC goal of LKR 350,000: Break it down - save LKR 30,000 monthly for 12 months. That's LKR 1,000 daily. Skip eating out twice a week and you're there! Track progress in our Goals section!",
+      "Goal achievement strategy: 1) Make it visual - set the goal image as your phone wallpaper, 2) Automate savings for it, 3) Celebrate milestones (every LKR 50,000 saved), 4) Find an accountability partner. You're 35% there already - keep pushing! 💪",
+      "Multiple goals? Use the 60-20-20 rule: 60% toward your biggest goal (Gaming PC), 20% for medium goal (Emergency fund), 20% for small goals (monthly treats). This keeps you motivated while making real progress! 🎮"
+    ],
+    
+    // Credit score and loans
+    credit: [
+      "Building credit in Sri Lanka? 📊 CRIB (Credit Information Bureau) tracks your score. Pay all loans/cards on time, keep credit utilization under 30%, don't apply for multiple loans quickly. Check your CRIB report annually (costs LKR 1,100)!",
+      "Loan preparation tips: 1) Maintain steady employment for 6+ months, 2) Keep debt-to-income ratio under 40%, 3) Save for 20% down payment (for assets), 4) Build relationship with one bank for better rates. Banks favor loyal customers! 🏦",
+      "Credit card wisdom: Use for convenience, not credit! Pay full balance monthly to avoid 24-36% interest. Use cards with rewards (Commercial Mastercard gives 1% cashback). Never withdraw cash on credit cards - 30% interest from day one! 💳"
+    ],
+    
+    // Student/youth specific
+    student: [
+      "Student money hacks! 🎓 1) Get student discounts everywhere (ask even if not advertised!), 2) Buy used textbooks from seniors, 3) Cook with friends to split costs, 4) Use campus facilities instead of gyms, 5) Tutor juniors for extra income!",
+      "Part-time income ideas for students: Online tutoring (LKR 1,000-3,000/hour), freelance writing (LKR 50-100 per word), social media management (LKR 15,000-30,000/month), delivery rider (flexible hours), or start a small campus business! 💼",
+      "Student to salary transition: When you get your first job, don't inflate lifestyle immediately! Keep student habits for 6 months while building emergency fund. Live on 70% of salary, save 30%. You're used to less, so this is easier now than later! 🎯"
+    ],
+    
+    // Emergency fund
+    emergency: [
+      "Emergency fund calculator: You spend LKR 40,000 monthly, so aim for LKR 120,000-240,000 (3-6 months). Currently you have LKR 80,000 saved. Great start! Add LKR 10,000 monthly and you'll reach the minimum in 4 months! 🛡️",
+      "Where to keep emergency funds: Split between instant access savings (LKR 50,000) and a 3-month fixed deposit with breaking facility (rest). This gives you immediate access plus slightly better interest. Never invest emergency funds in stocks! 🏦",
+      "Emergency fund hacks: 1) Save tax refunds entirely, 2) Save 50% of any bonus/gifts, 3) Do a 'no-spend month' once per quarter, 4) Sell unused items on ikman.lk. Small actions build big emergency funds! 💪"
+    ],
+    
+    // General motivation
+    general: [
+      "You're doing amazing! 🌟 This month you saved 15% more than last month. Your financial discipline is building wealth. Remember: every LKR 1,000 saved today is worth LKR 2,500 in 10 years with compound interest. Keep going!",
+      "Financial freedom is a marathon, not a sprint! 🏃 You've already built great habits - tracking expenses, setting goals, and asking for advice. These habits matter more than the amounts. Millionaires are made by consistency, not luck!",
+      "Your financial health check: ✅ Active savings, ✅ Tracking expenses, ✅ Clear goals, ✅ Learning continuously. You're in the top 20% of financial literacy! Keep building on these foundations. Wealth is inevitable with your discipline! 💎"
+    ]
+  };
+  
+  // Keyword matching for intelligent responses
+  if (lowerMessage.includes('budget') || lowerMessage.includes('expense') || lowerMessage.includes('spend')) {
+    return responseCategories.budget[Math.floor(Math.random() * responseCategories.budget.length)];
+  }
+  
+  if (lowerMessage.includes('save') || lowerMessage.includes('saving')) {
+    return responseCategories.saving[Math.floor(Math.random() * responseCategories.saving.length)];
+  }
+  
+  if (lowerMessage.includes('invest') || lowerMessage.includes('stock') || lowerMessage.includes('trading')) {
+    return responseCategories.invest[Math.floor(Math.random() * responseCategories.invest.length)];
+  }
+  
+  if (lowerMessage.includes('debt') || lowerMessage.includes('loan') || lowerMessage.includes('owe')) {
+    return responseCategories.debt[Math.floor(Math.random() * responseCategories.debt.length)];
+  }
+  
+  if (lowerMessage.includes('sri lanka') || lowerMessage.includes('lkr') || lowerMessage.includes('local')) {
+    return responseCategories.srilanka[Math.floor(Math.random() * responseCategories.srilanka.length)];
+  }
+  
+  if (lowerMessage.includes('goal') || lowerMessage.includes('target') || lowerMessage.includes('achieve')) {
+    return responseCategories.goals[Math.floor(Math.random() * responseCategories.goals.length)];
+  }
+  
+  if (lowerMessage.includes('credit') || lowerMessage.includes('crib') || lowerMessage.includes('score')) {
+    return responseCategories.credit[Math.floor(Math.random() * responseCategories.credit.length)];
+  }
+  
+  if (lowerMessage.includes('student') || lowerMessage.includes('university') || lowerMessage.includes('college')) {
+    return responseCategories.student[Math.floor(Math.random() * responseCategories.student.length)];
+  }
+  
+  if (lowerMessage.includes('emergency') || lowerMessage.includes('urgent') || lowerMessage.includes('crisis')) {
+    return responseCategories.emergency[Math.floor(Math.random() * responseCategories.emergency.length)];
+  }
+  
+  // Default to general motivation if no specific keyword match
+  return responseCategories.general[Math.floor(Math.random() * responseCategories.general.length)];
 };
 
-// Daily summary generator
+// Enhanced Daily Summary Generator with personalized insights
 export const getDailySummary = () => {
+  const date = new Date();
+  const day = date.getDay();
+  const hour = date.getHours();
+  
+  // Time-based greetings
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  
+  // Calculate some "dynamic" stats based on static data
+  const totalBalance = staticBankAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+  const monthlyExpenses = staticTransactions
+    .filter(t => t.transaction_type === 'expense')
+    .slice(0, 30)
+    .reduce((sum, t) => sum + t.amount, 0);
+  const savingsRate = ((totalBalance / (totalBalance + monthlyExpenses)) * 100).toFixed(1);
+  
   const summaries = [
-    "You're on fire today! 🔥 Your savings rate is up 15% this week. Keep that momentum going!",
-    "Smart moves today! You're LKR 5,000 closer to your Gaming PC goal. That RTX 4060 is calling! 🎮",
-    "Budget boss alert! 📊 You've stayed under budget for 5 days straight. New achievement unlocked soon!",
-    "Pro tip: You spent LKR 3,500 on food yesterday. Try meal prep to save more! 🍱",
-    "Your emergency fund is at 40%! Push for 50% this month and earn the Safety Net achievement! 🛡️",
-    "Investment opportunity: With your current savings rate, you could start investing LKR 5,000 monthly! 📈",
-    "You're crushing it! At this rate, you'll hit your Europe Trip goal 2 months early! ✈️"
+    `${greeting} Yusuf! 🌟 Your financial snapshot: LKR ${totalBalance.toLocaleString()} total balance with a ${savingsRate}% savings rate. You're in the top 10% of savers your age! Key action today: Review your Gaming PC fund - you're 35% there!`,
+    
+    `Daily insight 📊: You've saved LKR 15,000 this week - that's 50% above your target! Your discipline is paying off. At this rate, you'll have LKR 780,000 saved by year-end. Tip: Consider putting LKR 5,000 into a unit trust for better returns!`,
+    
+    `${greeting}! 💪 Achievement alert: 5-day streak of staying under budget! You're LKR 12,000 ahead of last month. Your top expense category is Food (35%) - try the meal prep challenge this week to save an extra LKR 3,000!`,
+    
+    `Financial health check ✅: Emergency fund at 40% (LKR 80,000/200,000). You're doing great! Add LKR 10,000 this month to hit 45%. Also, your Europe Trip fund needs LKR 425,000 more - consider a side hustle to accelerate this goal!`,
+    
+    `Smart money moment 🧠: Your spending is down 15% from last week! Main savings came from Transport (used bus instead of PickMe) and Food (home cooking). Keep this up and you'll save an extra LKR 8,000 monthly!`,
+    
+    `${greeting} champion! 🏆 You're crushing your goals: Gaming PC (35% complete), Europe Trip (15% complete), Emergency Fund (40% complete). Focus tip: Prioritize emergency fund to 100% before other goals for financial security!`,
+    
+    `Weekly wrap-up 📈: Spent LKR 28,000, Saved LKR 15,000, Invested LKR 0. Consider starting investing - even LKR 5,000 in an index fund beats savings account returns. Your money should work as hard as you do!`,
+    
+    `Motivation Monday 🚀: You've built amazing habits - tracking expenses daily, saving automatically, and setting clear goals. These habits will make you wealthy, not lucky breaks. Remember: Warren Buffett started with less than you have now!`,
+    
+    `Mid-week check ⚡: You're LKR 5,000 under budget so far! Use this surplus for your Gaming PC fund. Also, your subscription spending is LKR 2,500/month - audit these and cancel unused ones for instant savings!`,
+    
+    `Friday finance 💰: Weekend spending typically triples weekday spending. Set a LKR 5,000 weekend budget and stick to it. Pro tip: Withdraw cash so you can't overspend. What you save this weekend goes straight to Europe Trip fund!`
   ];
+  
+  // Return a semi-random but relevant summary
+  if (day === 1) return summaries[7]; // Monday motivation
+  if (day === 5) return summaries[9]; // Friday finance
+  if (day === 3) return summaries[8]; // Mid-week check
   
   return summaries[Math.floor(Math.random() * summaries.length)];
 };
 
-// Purchase assistant responses
+// Enhanced Purchase Assistant with detailed price comparisons and alternatives
 export const getPurchaseAssistance = (query) => {
+  const lowerQuery = query.toLowerCase();
+  
   const suggestions = {
-    default: "I found some great deals! Check Daraz.lk for 20% off electronics, and ikman.lk has second-hand options that could save you 40%! 🛍️",
-    phone: "For phones, check Dialog or Mobitel stores for installment plans. Singer has 0% interest deals! Also check ikman.lk for barely-used phones at 30% less! 📱",
-    laptop: "Best laptop deals: Redline Technologies, Unity Plaza, or check Daraz during sales. Consider refurbished from Barclays - same warranty, 40% cheaper! 💻",
-    clothes: "Fashion deals: ODEL, Fashion Bug, and Cotton Collection have student discounts! Also check Thrift shops in Wellawatte for branded items at 70% off! 👕",
-    food: "Food savings: Use PickMe Food for discounts, Uber Eats has promo codes for first orders. Keells and Arpico have loyalty programs for regular savings! 🍔",
-    gaming: "Gaming deals: Game Street in Unity Plaza, or check Facebook marketplace. Steam sales can save you 75% on games! Consider Epic Games free weekly games! 🎮"
+    phone: `📱 SMART PHONE SHOPPING GUIDE:
+    
+    🏪 BEST PLACES TO BUY:
+    • Dialog/Mobitel Stores: 0% installment plans over 12-24 months
+    • Singer: Trade-in offers + installments (but 15% more expensive overall)
+    • Abans: Good warranty but prices 10-20% higher
+    • ikman.lk: Used phones 30-50% cheaper (check seller ratings!)
+    • Daraz.lk: Wait for 11.11 or 12.12 sales for 25% discounts
+    
+    💰 MONEY-SAVING ALTERNATIVES:
+    • Instead of iPhone 15 (LKR 450,000), get iPhone 13 (LKR 250,000) - 90% same features
+    • Xiaomi/Realme offer flagship features at 40% less than Samsung
+    • Buy last year's flagship during new model launches (30% instant discount)
+    
+    🎯 BEST DEALS RIGHT NOW:
+    • Samsung A54: LKR 125,000 (was 150,000)
+    • Xiaomi Redmi Note 12 Pro: LKR 85,000 (amazing value!)
+    • Used iPhone 12: LKR 150,000 on ikman (retail: 220,000)
+    
+    ⚠️ AVOID: Gray market imports (no warranty), very old models (no software updates)`,
+    
+    laptop: `💻 LAPTOP BUYING GUIDE:
+    
+    🏪 WHERE TO BUY:
+    • Unity Plaza: Best prices but check multiple shops
+    • Redline Technologies: Reliable, good warranty, fair prices
+    • Laptop.lk: Online convenience, doorstep delivery
+    • Metropolitan: Premium options, excellent service
+    • Barclays: Refurbished business laptops (50% cheaper, same performance!)
+    
+    💰 SMART ALTERNATIVES:
+    • Need it for coding? Used ThinkPad T480 (LKR 125,000) beats new budget laptops
+    • Just for studies? Chromebook (LKR 75,000) or tablet with keyboard
+    • Gaming? Build a desktop (30% more power for same price)
+    
+    🎯 CURRENT BEST DEALS:
+    • ASUS VivoBook 15: LKR 165,000 (perfect for students)
+    • Refurbished Dell Latitude: LKR 95,000 (business-grade quality)
+    • HP Pavilion Gaming: LKR 285,000 (entry-level gaming)
+    
+    💡 PRO TIP: Buy during back-to-school season (January) or year-end clearance (December) for 20% savings!`,
+    
+    clothes: `👕 FASHION SHOPPING HACKS:
+    
+    🏪 BEST VALUE STORES:
+    • Fashion Bug: Trendy + affordable (wait for 50% sales every month-end)
+    • ODEL: Quality basics, student discount on Tuesdays
+    • Cotton Collection: Great quality, bulk discounts
+    • Mondy: Professional wear at reasonable prices
+    • House of Fashion: Wide variety, frequent BOGOF deals
+    
+    💰 MONEY-SAVING SECRETS:
+    • Thrift Shops (Wellawatte/Dehiwala): Branded items at 70% off
+    • Facebook Groups: "Thrift Lk", "Colombo Garage Sale"
+    • End-of-season sales: 60-70% off (March & September)
+    • Factory outlets: Katunayake/Biyagama (50% cheaper than retail)
+    
+    🎯 SMART SHOPPING STRATEGY:
+    • Basic tees: LKR 800-1,200 at Cotton Collection
+    • Jeans: LKR 3,000-4,000 at Fashion Bug (wait for sales: LKR 2,000)
+    • Formal shirts: LKR 2,500 at Mondy
+    • Shoes: DSI/Bata for daily wear (LKR 3,000-5,000)
+    
+    ⚡ QUICK TIP: Build a capsule wardrobe - 15 quality pieces that mix & match saves more than 50 cheap items!`,
+    
+    food: `🍔 FOOD & GROCERY SAVINGS:
+    
+    🏪 GROCERY SHOPPING:
+    • Keells: Nexus card for 5% cashback + weekly deals
+    • Arpico: Best bulk prices, huge savings on own-brand items
+    • Laughs: Cheapest for vegetables and fruits
+    • Sathosa: Government prices (10-15% cheaper but limited variety)
+    • Sunday Pola: Fresh produce at 40% less than supermarkets
+    
+    🍕 EATING OUT SMARTLY:
+    • PickMe Food: Daily deals + promo codes (save 20-30%)
+    • Uber Eats: First-time user codes per restaurant
+    • Yamu.lk: Find BOGOF deals and happy hours
+    • Credit card offers: 20-50% off at selected restaurants
+    
+    💰 MEAL PLANNING TIPS:
+    • Weekly meal prep: LKR 200/meal vs LKR 800 eating out
+    • Rice & curry packet: LKR 250-350 (filling and economical)
+    • Cook in bulk: Make curry for 3 days (saves time + money)
+    
+    📊 BUDGET BREAKDOWN:
+    • Groceries (cooking): LKR 15,000/month
+    • Eating out daily: LKR 45,000/month
+    • Mixed (smart): LKR 20,000/month
+    You could save LKR 25,000 monthly by cooking more!`,
+    
+    gaming: `🎮 GAMING DEALS & ALTERNATIVES:
+    
+    🏪 WHERE TO BUY:
+    • Unity Plaza (Game Street, Tech Land): Best local prices
+    • Nano Gaming: Good for PC parts and peripherals
+    • Facebook Groups: "Sri Lanka PC Gaming", "Console Gaming LK"
+    • ikman.lk: Used consoles 30-40% cheaper
+    
+    💰 SMART GAMING ON BUDGET:
+    • PS4 instead of PS5: 60% cheaper, huge game library
+    • Xbox Game Pass: LKR 2,000/month for 100+ games
+    • Epic Games: FREE game every week!
+    • Steam Sales: 50-90% off during seasonal sales
+    • GeForce NOW: Cloud gaming (no expensive PC needed)
+    
+    🎯 CURRENT BEST VALUE:
+    • Used PS4 Slim: LKR 75,000 (new: 120,000)
+    • Gaming PC Build: LKR 250,000 (GTX 1660 Super setup)
+    • Nintendo Switch Lite: LKR 65,000 (portable gaming)
+    
+    💡 MONEY-SAVING TIPS:
+    • Buy physical games used, sell after finishing (70% value retained)
+    • Share digital accounts with friends (split costs)
+    • Wait 6 months after release (50% price drop)
+    • Join local gaming communities for game swaps`,
+    
+    electronics: `📱 ELECTRONICS SHOPPING GUIDE:
+    
+    🏪 TRUSTED STORES:
+    • Singer: Reliable but 15-20% premium
+    • Abans: Good warranty, hire-purchase available
+    • Softlogic: Wide range, competitive prices
+    • Daraz: Online deals but check seller ratings
+    • Unity Plaza: Best prices for computer parts
+    
+    💰 GENERAL SAVINGS TIPS:
+    • Buy during Avurudu season (April): 20-30% discounts
+    • Black Friday (November): Online deals
+    • Credit card promotions: 0% installments
+    • Exchange offers: Trade old for new
+    
+    🎯 SMART SHOPPING:
+    • Compare prices on ikman before buying new
+    • Check warranty terms (international vs local)
+    • Consider refurbished with warranty
+    • Buy last year's model when new launches
+    
+    ⚠️ AVOID: No-name brands without warranty, too-good-to-be-true online deals`,
+    
+    default: `🛍️ SMART SHOPPING ASSISTANT:
+    
+    I'll help you find the best deals! Here's my general advice:
+    
+    📊 PRICE COMPARISON TOOLS:
+    • ikman.lk: Compare new vs used prices
+    • Daraz.lk: Check daily flash deals
+    • PriceCheck.lk: Compare across stores
+    • Facebook Marketplace: Local deals
+    
+    💰 UNIVERSAL SAVINGS TIPS:
+    • Always check for student discounts (10-20% off)
+    • Use credit card offers (up to 50% off)
+    • Buy during sales seasons (Avurudu, Christmas, 11.11)
+    • Consider quality used items (40-60% savings)
+    • Join Facebook buy/sell groups for your area
+    
+    🎯 BEFORE YOU BUY:
+    1. Do I really need this? (24-hour rule)
+    2. Can I find it used/refurbished?
+    3. Is there a cheaper alternative?
+    4. Can I wait for a sale?
+    5. Will this help me reach my goals?
+    
+    Tell me what specific item you're looking for, and I'll give you detailed guidance!`
   };
   
-  // Simple keyword matching
-  const lowerQuery = query.toLowerCase();
-  if (lowerQuery.includes('phone') || lowerQuery.includes('mobile')) return suggestions.phone;
-  if (lowerQuery.includes('laptop') || lowerQuery.includes('computer')) return suggestions.laptop;
-  if (lowerQuery.includes('clothes') || lowerQuery.includes('shirt') || lowerQuery.includes('dress')) return suggestions.clothes;
-  if (lowerQuery.includes('food') || lowerQuery.includes('eat')) return suggestions.food;
-  if (lowerQuery.includes('game') || lowerQuery.includes('gaming')) return suggestions.gaming;
+  // Enhanced keyword matching
+  if (lowerQuery.includes('phone') || lowerQuery.includes('mobile') || lowerQuery.includes('iphone') || lowerQuery.includes('samsung')) {
+    return suggestions.phone;
+  }
   
+  if (lowerQuery.includes('laptop') || lowerQuery.includes('computer') || lowerQuery.includes('macbook') || lowerQuery.includes('notebook')) {
+    return suggestions.laptop;
+  }
+  
+  if (lowerQuery.includes('clothes') || lowerQuery.includes('shirt') || lowerQuery.includes('dress') || lowerQuery.includes('fashion') || lowerQuery.includes('shoes')) {
+    return suggestions.clothes;
+  }
+  
+  if (lowerQuery.includes('food') || lowerQuery.includes('eat') || lowerQuery.includes('grocery') || lowerQuery.includes('restaurant')) {
+    return suggestions.food;
+  }
+  
+  if (lowerQuery.includes('game') || lowerQuery.includes('gaming') || lowerQuery.includes('ps5') || lowerQuery.includes('xbox') || lowerQuery.includes('console')) {
+    return suggestions.gaming;
+  }
+  
+  if (lowerQuery.includes('tv') || lowerQuery.includes('fridge') || lowerQuery.includes('washing') || lowerQuery.includes('electronic')) {
+    return suggestions.electronics;
+  }
+  
+  // If no specific match, provide general advice with a hint to be more specific
   return suggestions.default;
 };
