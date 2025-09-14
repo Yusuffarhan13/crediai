@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Target, Trophy, Activity, Plus, ShoppingCart, Sparkles, X, Send, PiggyBank, Brain, MessageCircle } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import { dataManager, getChatResponse, getDailySummary, getPurchaseAssistance } from '../data/staticData';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -28,14 +28,14 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = () => {
     try {
-      const response = await axios.get('/api/dashboard?user_id=1');
-      setDashboardData(response.data);
+      const data = dataManager.getDashboardData();
+      setDashboardData(data);
       
       // Process data for charts
-      processChartData(response.data.recent_transactions);
-      processCategoryData(response.data.recent_transactions);
+      processChartData(data.recent_transactions);
+      processCategoryData(data.recent_transactions);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -91,56 +91,51 @@ const Dashboard = () => {
     setCategoryData(data);
   };
 
-  const handleQuickChat = async () => {
+  const handleQuickChat = () => {
     if (!chatMessage.trim()) return;
     
     try {
-      const response = await axios.post('/api/chat', {
-        message: chatMessage,
-        user_id: 1
-      });
-      setChatResponse(response.data.response);
+      const response = getChatResponse(chatMessage);
+      setChatResponse(response);
+      setChatMessage('');
     } catch (error) {
       setChatResponse("Hey! I'm here to help with your money questions! 💸");
     }
   };
 
-  const getDailySummary = async () => {
+  const handleGetDailySummary = () => {
     setSummaryLoading(true);
-    try {
-      const response = await axios.post('/api/daily-summary', {
-        user_id: 1
-      });
-      setDailySummary(response.data.summary);
-    } catch (error) {
-      setDailySummary("Hey Yusuf! Keep crushing your financial goals today! 💪🇱🇰");
-    } finally {
-      setSummaryLoading(false);
-    }
+    setTimeout(() => {
+      try {
+        const summary = getDailySummary();
+        setDailySummary(summary);
+      } catch (error) {
+        setDailySummary("Hey Yusuf! Keep crushing your financial goals today! 💪🇱🇰");
+      } finally {
+        setSummaryLoading(false);
+      }
+    }, 500); // Simulate loading
   };
 
-  const handlePurchaseAssistant = async () => {
+  const handlePurchaseAssistant = () => {
     if (!purchaseQuery.trim()) return;
     
     try {
-      const response = await axios.post('/api/purchase-assistant', {
-        message: purchaseQuery,
-        user_id: 1
-      });
-      setPurchaseResponse(response.data.response);
+      const response = getPurchaseAssistance(purchaseQuery);
+      setPurchaseResponse(response);
     } catch (error) {
       setPurchaseResponse("I can help you find deals! Try checking Daraz.lk, ikman.lk for best prices! 🛍️💰");
     }
   };
 
-  const handleQuickAction = async (type) => {
+  const handleQuickAction = (type) => {
     if (!quickActionData.amount || !quickActionData.description) {
       alert('Please fill in all fields! 📝');
       return;
     }
 
     try {
-      await axios.post('/api/transactions?user_id=1', {
+      dataManager.addTransaction({
         amount: parseFloat(quickActionData.amount),
         category: type === 'savings' ? 'Savings' : 'Shopping',
         description: quickActionData.description,
@@ -258,7 +253,7 @@ const Dashboard = () => {
             </div>
             <button 
               className="summary-btn"
-              onClick={getDailySummary}
+              onClick={handleGetDailySummary}
               disabled={summaryLoading}
             >
               {summaryLoading ? '🔄' : '✨'} Get AI Summary

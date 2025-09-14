@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Plus, TrendingUp, Calendar, DollarSign, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import { dataManager } from '../data/staticData';
 import './Goals.css';
 
 const Goals = () => {
@@ -20,10 +20,10 @@ const Goals = () => {
     fetchGoals();
   }, []);
 
-  const fetchGoals = async () => {
+  const fetchGoals = () => {
     try {
-      const response = await axios.get('/api/goals?user_id=1');
-      setGoals(response.data);
+      const goalsData = dataManager.getGoals();
+      setGoals(goalsData);
     } catch (error) {
       console.error('Error fetching goals:', error);
     } finally {
@@ -31,17 +31,19 @@ const Goals = () => {
     }
   };
 
-  const handleAddGoal = async () => {
+  const handleAddGoal = () => {
     if (!newGoal.title || !newGoal.target_amount || !newGoal.deadline) {
       alert('Please fill in all fields');
       return;
     }
 
     try {
-      await axios.post('/api/goals?user_id=1', {
+      dataManager.addGoal({
         title: newGoal.title,
         target_amount: parseFloat(newGoal.target_amount),
-        deadline: new Date(newGoal.deadline).toISOString()
+        deadline: newGoal.deadline,
+        description: '',
+        category: 'General'
       });
       
       fetchGoals();
@@ -52,12 +54,12 @@ const Goals = () => {
     }
   };
 
-  const handleUpdateProgress = async () => {
+  const handleUpdateProgress = () => {
     if (!updateAmount || !selectedGoal) return;
 
     try {
-      await axios.put(`/api/goals/${selectedGoal.id}`, {
-        current_amount: parseFloat(updateAmount)
+      dataManager.updateGoal(selectedGoal.id, {
+        current_amount: selectedGoal.current_amount + parseFloat(updateAmount)
       });
       
       fetchGoals();
@@ -69,10 +71,10 @@ const Goals = () => {
     }
   };
 
-  const handleCompleteGoal = async (goalId) => {
+  const handleCompleteGoal = (goalId) => {
     try {
-      await axios.put(`/api/goals/${goalId}`, {
-        completed: true
+      dataManager.updateGoal(goalId, {
+        status: 'completed'
       });
       fetchGoals();
     } catch (error) {

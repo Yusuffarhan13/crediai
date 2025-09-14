@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, TrendingUp, TrendingDown, Calendar, CreditCard, PiggyBank, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import { dataManager } from '../data/staticData';
 import './Transactions.css';
 
 const Transactions = () => {
@@ -154,7 +154,7 @@ const Transactions = () => {
               <div className="bank-logo">HNB</div>
               <div className="card-type">{mainAccount.account_type}</div>
             </div>
-            <div className="card-number">{mainAccount.card_number}</div>
+            <div className="card-number">{mainAccount.account_number || '****4521'}</div>
             <div className="card-details">
               <div className="card-stat">
                 <span className="label">Balance</span>

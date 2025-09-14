@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Lock, Unlock, Star, Award, Zap } from 'lucide-react';
-import axios from 'axios';
+import { dataManager } from '../data/staticData';
 import './Achievements.css';
 
 const Achievements = () => {
@@ -13,13 +13,13 @@ const Achievements = () => {
     fetchAchievements();
   }, []);
 
-  const fetchAchievements = async () => {
+  const fetchAchievements = () => {
     try {
-      const response = await axios.get('/api/achievements?user_id=1');
-      setAchievements(response.data);
+      const achievementsData = dataManager.getAchievements();
+      setAchievements(achievementsData);
       
-      const points = response.data
-        .filter(a => a.unlocked)
+      const points = achievementsData
+        .filter(a => a.earned)
         .reduce((sum, a) => sum + a.points, 0);
       setTotalPoints(points);
       setLevel(Math.floor(points / 100) + 1);
@@ -30,10 +30,11 @@ const Achievements = () => {
     }
   };
 
-  const handleUnlock = async (achievementId) => {
+  const handleUnlock = (achievementId) => {
     try {
-      await axios.post(`/api/achievements/${achievementId}/unlock`);
-      fetchAchievements();
+      // In static mode, achievements are pre-determined
+      // This function is kept for UI interaction but doesn't actually unlock
+      alert('Achievement progress is tracked automatically!');
     } catch (error) {
       console.error('Error unlocking achievement:', error);
     }
@@ -56,8 +57,8 @@ const Achievements = () => {
     );
   }
 
-  const unlockedAchievements = achievements.filter(a => a.unlocked);
-  const lockedAchievements = achievements.filter(a => !a.unlocked);
+  const unlockedAchievements = achievements.filter(a => a.earned);
+  const lockedAchievements = achievements.filter(a => !a.earned);
 
   return (
     <div className="achievements">
@@ -140,7 +141,7 @@ const Achievements = () => {
                 <div className="achievement-footer">
                   <span className="points">+{achievement.points} points</span>
                   <span className="unlocked-date">
-                    Unlocked {new Date(achievement.unlocked_at).toLocaleDateString()}
+                    Unlocked {new Date(achievement.earned_date || Date.now()).toLocaleDateString()}
                   </span>
                 </div>
               </div>

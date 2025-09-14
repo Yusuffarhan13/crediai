@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles } from 'lucide-react';
-import axios from 'axios';
+import { getChatResponse } from '../data/staticData';
 import './Chat.css';
 
 const Chat = () => {
@@ -73,24 +73,23 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const endpoint = voiceEnabled ? 'http://localhost:8000/api/voice-response' : 'http://localhost:8000/api/chat';
-      const response = await axios.post(endpoint, {
-        message: inputMessage,
-        user_id: 1
-      });
+      // Simulate API delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const responseText = getChatResponse(inputMessage);
 
       const aiMessage = {
         type: 'ai',
-        content: response.data.response,
+        content: responseText,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Play audio if available and voice is enabled
-      if (voiceEnabled && response.data.audio_url) {
-        playAudio(response.data.audio_url);
-      }
+      // Voice functionality disabled in static mode
+      // if (voiceEnabled && response.data.audio_url) {
+      //   playAudio(response.data.audio_url);
+      // }
     } catch (error) {
       console.error('Error sending message:', error);
       // Generate a fallback response based on the message
